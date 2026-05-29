@@ -3,6 +3,16 @@ import { createClient } from '@supabase/supabase-js'
 
 const BASE_URL = 'https://jeugdjournaal.nl'
 
+function decodeHtml(str: string): string {
+  return str
+    .replace(/&#x27;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+}
+
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.SCRAPE_SECRET}`) {
@@ -47,7 +57,8 @@ export async function POST(req: NextRequest) {
         // Extract title
         const titleMatch = detailHtml.match(/<h1[^>]*>([^<]+)<\/h1>/) ||
                            detailHtml.match(/<title>([^<]+)<\/title>/)
-        const title = titleMatch?.[1]?.replace(' - NOS Jeugdjournaal', '').trim() || article.slug.replace(/-/g, ' ')
+        const rawTitle = titleMatch?.[1]?.replace(' - NOS Jeugdjournaal', '').trim() || article.slug.replace(/-/g, ' ')
+        const title = decodeHtml(rawTitle)
 
         // Extract image
         const imgMatch = detailHtml.match(/og:image" content="([^"]+)"/) ||
@@ -56,7 +67,7 @@ export async function POST(req: NextRequest) {
 
         // Extract description
         const descMatch = detailHtml.match(/og:description" content="([^"]+)"/)
-        const summary = descMatch?.[1] || null
+        const summary = descMatch?.[1] ? decodeHtml(descMatch[1]) : null
 
         const { error } = await supabase.from('articles').upsert({
           title,
