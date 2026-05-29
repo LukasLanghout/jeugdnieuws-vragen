@@ -80,7 +80,7 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
         <h2 className="text-lg font-bold text-gray-900 mb-3">
           Welke vraag stelde jouw kind?
         </h2>
-        <QuestionForm articleId={article.id} userId={user?.id ?? null} />
+        <QuestionForm articleId={article.id} user={user} />
       </div>
     </div>
   )
