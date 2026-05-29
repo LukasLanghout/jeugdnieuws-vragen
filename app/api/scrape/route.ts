@@ -5,12 +5,25 @@ const BASE_URL = 'https://jeugdjournaal.nl'
 
 function decodeHtml(str: string): string {
   return str
-    .replace(/&#x27;/g, "'")
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>').replace(/&quot;/g, '"')
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+}
+
+function extractContent(html: string): string {
+  // Try to grab article paragraphs
+  const bodyMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/) ||
+                    html.match(/<div[^>]*class="[^"]*article[^"]*"[^>]*>([\s\S]*?)<\/div>/)
+  const body = bodyMatch?.[1] || html
+
+  // Extract all <p> tag content
+  const paragraphs: string[] = []
+  const pMatches = body.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)
+  for (const m of pMatches) {
+    const text = m[1].replace(/<[^>]+>/g, '').trim()
+    if (text.length > 30) paragraphs.push(decodeHtml(text))
+  }
+  return paragraphs.slice(0, 15).join('\n\n')
 }
 
 export async function POST(req: NextRequest) {
@@ -31,7 +44,6 @@ export async function POST(req: NextRequest) {
     if (!res.ok) throw new Error(`Fetch failed: ${res.status}`)
     const html = await res.text()
 
-    // Extract article links from homepage
     const articleRegex = /href="(\/artikel\/(\d+)-([^"]+))"/g
     const seen = new Set<string>()
     const articles: Array<{ id: string; slug: string; path: string }> = []
@@ -39,13 +51,9 @@ export async function POST(req: NextRequest) {
     let match
     while ((match = articleRegex.exec(html)) !== null) {
       const [, path, id, slug] = match
-      if (!seen.has(id)) {
-        seen.add(id)
-        articles.push({ id, slug, path })
-      }
+      if (!seen.has(id)) { seen.add(id); articles.push({ id, slug, path }) }
     }
 
-    // Fetch detail pages for first 8 articles
     let inserted = 0
     for (const article of articles.slice(0, 8)) {
       try {
@@ -54,33 +62,26 @@ export async function POST(req: NextRequest) {
         })
         const detailHtml = await detailRes.text()
 
-        // Extract title
-        const titleMatch = detailHtml.match(/<h1[^>]*>([^<]+)<\/h1>/) ||
-                           detailHtml.match(/<title>([^<]+)<\/title>/)
+        const titleMatch = detailHtml.match(/<h1[^>]*>([^<]+)<\/h1>/) || detailHtml.match(/<title>([^<]+)<\/title>/)
         const rawTitle = titleMatch?.[1]?.replace(' - NOS Jeugdjournaal', '').trim() || article.slug.replace(/-/g, ' ')
         const title = decodeHtml(rawTitle)
 
-        // Extract image
-        const imgMatch = detailHtml.match(/og:image" content="([^"]+)"/) ||
-                         detailHtml.match(/<img[^>]+src="(https:\/\/static\.nos\.nl[^"]+)"/)
+        const imgMatch = detailHtml.match(/og:image" content="([^"]+)"/)
         const image_url = imgMatch?.[1] || null
 
-        // Extract description
         const descMatch = detailHtml.match(/og:description" content="([^"]+)"/)
         const summary = descMatch?.[1] ? decodeHtml(descMatch[1]) : null
 
+        const content = extractContent(detailHtml)
+
         const { error } = await supabase.from('articles').upsert({
-          title,
-          summary,
-          image_url,
+          title, summary, content, image_url,
           source_url: `${BASE_URL}${article.path}`,
           published_at: new Date().toISOString(),
-        }, { onConflict: 'source_url', ignoreDuplicates: true })
+        }, { onConflict: 'source_url', ignoreDuplicates: false })
 
         if (!error) inserted++
-      } catch {
-        // skip failed articles
-      }
+      } catch { /* skip */ }
     }
 
     return NextResponse.json({ success: true, found: articles.length, inserted })
