@@ -16,12 +16,12 @@ export default function QuestionForm({ articleId, user }: { articleId: string; u
 
   if (!user) {
     return (
-      <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6 text-center">
-        <p className="text-2xl mb-2">👋</p>
-        <p className="font-semibold text-gray-800 mb-1">Wat vroeg jouw kind over dit bericht?</p>
-        <p className="text-sm text-gray-500 mb-4">Log eerst in om een vraag te delen</p>
-        <Link href="/login" className="bg-orange-500 text-white px-5 py-2 rounded-xl font-semibold hover:bg-orange-600 transition-colors">
-          Inloggen
+      <div style={{ textAlign: 'center', padding: '8px 0' }}>
+        <div style={{ fontSize: 36, marginBottom: 10 }}>👋</div>
+        <p style={{ fontWeight: 700, color: '#111827', fontSize: 15, margin: '0 0 6px' }}>Log in om een vraag te delen</p>
+        <p style={{ fontSize: 13, color: '#9ca3af', margin: '0 0 18px' }}>Maak een gratis account aan en deel de vragen van je kind</p>
+        <Link href="/login" style={{ display: 'inline-block', background: '#f97316', color: 'white', padding: '10px 24px', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+          Inloggen of aanmelden
         </Link>
       </div>
     )
@@ -49,10 +49,13 @@ export default function QuestionForm({ articleId, user }: { articleId: string; u
 
   if (submitted) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-        <p className="text-2xl mb-2">🎉</p>
-        <p className="font-semibold text-gray-800">Bedankt voor het delen!</p>
-        <button onClick={() => setSubmitted(false)} className="mt-3 text-sm text-orange-600 hover:underline">
+      <div style={{ textAlign: 'center', padding: '12px 0' }}>
+        <div style={{ fontSize: 36, marginBottom: 10 }}>🎉</div>
+        <p style={{ fontWeight: 700, color: '#111827', fontSize: 15, margin: '0 0 12px' }}>Bedankt voor het delen!</p>
+        <button
+          onClick={() => setSubmitted(false)}
+          style={{ fontSize: 13, color: '#f97316', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+        >
           Nog een vraag toevoegen
         </button>
       </div>
@@ -60,26 +63,46 @@ export default function QuestionForm({ articleId, user }: { articleId: string; u
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-6">
-      <h3 className="font-bold text-gray-900 mb-1">Wat vroeg jouw kind?</h3>
-      <p className="text-sm text-gray-500 mb-4">Deel de vraag of het gesprek dat jullie hadden aan de eettafel</p>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <textarea
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Bijv: Waarom mogen kinderen in dat land niet naar school?"
-          rows={3}
-          className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"
-        />
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <button
-          type="submit"
-          disabled={loading || !question.trim()}
-          className="bg-orange-500 text-white rounded-xl py-3 font-semibold hover:bg-orange-600 disabled:opacity-50 transition-colors"
-        >
-          {loading ? 'Opslaan...' : 'Vraag delen'}
-        </button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <textarea
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
+        placeholder="Bijv: Waarom mogen kinderen in dat land niet naar school?"
+        rows={3}
+        style={{
+          border: '1.5px solid #e5e7eb',
+          borderRadius: 12,
+          padding: '12px 14px',
+          fontSize: 14,
+          resize: 'none',
+          outline: 'none',
+          color: '#111827',
+          lineHeight: 1.6,
+          transition: 'border-color 0.15s',
+          fontFamily: 'inherit',
+        }}
+        onFocus={e => e.currentTarget.style.borderColor = '#f97316'}
+        onBlur={e => e.currentTarget.style.borderColor = '#e5e7eb'}
+      />
+      {error && <p style={{ fontSize: 13, color: '#ef4444', margin: 0 }}>{error}</p>}
+      <button
+        type="submit"
+        disabled={loading || !question.trim()}
+        style={{
+          background: loading || !question.trim() ? '#e5e7eb' : '#f97316',
+          color: loading || !question.trim() ? '#9ca3af' : 'white',
+          border: 'none',
+          borderRadius: 10,
+          padding: '12px 0',
+          fontWeight: 700,
+          fontSize: 14,
+          cursor: loading || !question.trim() ? 'not-allowed' : 'pointer',
+          transition: 'background 0.15s',
+          fontFamily: 'inherit',
+        }}
+      >
+        {loading ? 'Opslaan...' : 'Vraag delen'}
+      </button>
+    </form>
   )
 }

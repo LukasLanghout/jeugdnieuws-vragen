@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -39,70 +40,114 @@ export default function LoginPage() {
     setLoading(false)
   }
 
+  const inputStyle = {
+    width: '100%',
+    border: '1.5px solid #e5e7eb',
+    borderRadius: 10,
+    padding: '12px 14px',
+    fontSize: 14,
+    outline: 'none',
+    color: '#111827',
+    boxSizing: 'border-box' as const,
+    fontFamily: 'inherit',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
+  }
+
   return (
-    <div className="max-w-sm mx-auto mt-10">
-      <div className="bg-white rounded-2xl shadow-sm p-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">
-          {mode === 'login' ? 'Inloggen' : 'Account aanmaken'}
-        </h2>
-        <p className="text-gray-500 text-sm mb-6">
-          {mode === 'login'
-            ? 'Log in om vragen te delen over het nieuws.'
-            : 'Maak een account aan om vragen te delen.'}
-        </p>
+    <div style={{ maxWidth: 400, margin: '0 auto', paddingTop: 20 }}>
+      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#f97316', textDecoration: 'none', marginBottom: 28 }}>
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7"/>
+        </svg>
+        Terug
+      </Link>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm mb-4">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-green-800 text-sm mb-4">
-            {success}
-          </div>
-        )}
+      <div style={{ background: 'white', borderRadius: 20, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+        {/* Tab switcher */}
+        <div style={{ display: 'flex', borderBottom: '1px solid #f3f4f6' }}>
+          {(['login', 'signup'] as const).map(m => (
+            <button
+              key={m}
+              onClick={() => { setMode(m); setError(''); setSuccess('') }}
+              style={{
+                flex: 1,
+                padding: '16px 0',
+                fontWeight: 700,
+                fontSize: 14,
+                border: 'none',
+                background: 'none',
+                cursor: 'pointer',
+                color: mode === m ? '#f97316' : '#9ca3af',
+                borderBottom: mode === m ? '2px solid #f97316' : '2px solid transparent',
+                transition: 'color 0.15s',
+                fontFamily: 'inherit',
+              }}
+            >
+              {m === 'login' ? 'Inloggen' : 'Account aanmaken'}
+            </button>
+          ))}
+        </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            type="email"
-            required
-            placeholder="jouw@email.nl"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-          />
-          <input
-            type="password"
-            required
-            placeholder="Wachtwoord"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-orange-500 text-white rounded-xl py-3 font-semibold hover:bg-orange-600 disabled:opacity-50 transition-colors"
-          >
-            {loading ? 'Laden...' : mode === 'login' ? 'Inloggen' : 'Account aanmaken'}
-          </button>
-        </form>
+        <div style={{ padding: 28 }}>
+          <p style={{ fontSize: 13, color: '#9ca3af', margin: '0 0 22px' }}>
+            {mode === 'login'
+              ? 'Log in om vragen van je kind te delen over het nieuws.'
+              : 'Maak een gratis account aan om vragen te delen.'}
+          </p>
 
-        <p className="text-sm text-center mt-4 text-gray-500">
-          {mode === 'login' ? (
-            <>Nog geen account?{' '}
-              <button onClick={() => { setMode('signup'); setError(''); setSuccess('') }} className="text-orange-600 hover:underline font-medium">
-                Aanmelden
-              </button>
-            </>
-          ) : (
-            <>Al een account?{' '}
-              <button onClick={() => { setMode('login'); setError(''); setSuccess('') }} className="text-orange-600 hover:underline font-medium">
-                Inloggen
-              </button>
-            </>
+          {error && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#dc2626', marginBottom: 16 }}>
+              {error}
+            </div>
           )}
-        </p>
+          {success && (
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#16a34a', marginBottom: 16 }}>
+              {success}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <input
+              type="email"
+              required
+              placeholder="jouw@email.nl"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={inputStyle}
+              onFocus={e => { e.currentTarget.style.borderColor = '#f97316'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.12)'; }}
+              onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.boxShadow = 'none'; }}
+            />
+            <input
+              type="password"
+              required
+              placeholder="Wachtwoord"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={inputStyle}
+              onFocus={e => { e.currentTarget.style.borderColor = '#f97316'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.12)'; }}
+              onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.boxShadow = 'none'; }}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                background: loading ? '#e5e7eb' : '#f97316',
+                color: loading ? '#9ca3af' : 'white',
+                border: 'none',
+                borderRadius: 10,
+                padding: '13px 0',
+                fontWeight: 700,
+                fontSize: 15,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                marginTop: 4,
+                fontFamily: 'inherit',
+                transition: 'background 0.15s',
+              }}
+            >
+              {loading ? 'Laden...' : mode === 'login' ? 'Inloggen' : 'Account aanmaken'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   )

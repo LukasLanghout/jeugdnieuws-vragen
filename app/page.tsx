@@ -19,44 +19,74 @@ async function getArticles(): Promise<Article[]> {
   return data ?? []
 }
 
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' })
+}
+
 export default async function HomePage() {
   const articles = await getArticles()
+  const [hero, ...rest] = articles
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-800">Nieuw van het Jeugdjournaal</h2>
-        <Link href="/login" className="text-sm text-orange-600 hover:underline">Inloggen</Link>
-      </div>
-
       <SearchBar />
 
       {articles.length === 0 ? (
-        <div className="bg-white rounded-2xl p-8 text-center text-gray-500 shadow-sm">
-          <p className="text-4xl mb-3">📺</p>
-          <p className="font-medium">Nog geen nieuwsberichten</p>
+        <div style={{ background: 'white', borderRadius: 16, padding: 48, textAlign: 'center', color: '#9ca3af' }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>📺</div>
+          <p style={{ fontWeight: 600, color: '#374151' }}>Nog geen nieuwsberichten</p>
+          <p style={{ fontSize: 14, marginTop: 4 }}>Voer de scraper uit om artikelen te laden</p>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {articles.map((article) => (
-            <Link key={article.id} href={`/artikel/${article.id}`}>
-              <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow p-4 flex gap-4 items-start cursor-pointer">
-                {article.image_url && (
-                  <img src={article.image_url} alt="" className="w-24 h-20 object-cover rounded-xl flex-shrink-0" />
+        <div>
+          {/* Hero card */}
+          {hero && (
+            <Link href={`/artikel/${hero.id}`} style={{ textDecoration: 'none', display: 'block', marginBottom: 20 }}>
+              <div style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)', transition: 'box-shadow 0.2s' }}
+                onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.12)')}
+                onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)')}>
+                {hero.image_url && (
+                  <img src={hero.image_url} alt="" style={{ width: '100%', height: 240, objectFit: 'cover' }} />
                 )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-orange-500 font-semibold mb-1">
-                    {new Date(article.published_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' })}
-                  </p>
-                  <h3 className="font-bold text-gray-900 leading-snug">{article.title}</h3>
-                  {article.summary && (
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{article.summary}</p>
+                <div style={{ padding: '18px 22px 22px' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {formatDate(hero.published_at)}
+                  </span>
+                  <h2 style={{ fontSize: 22, fontWeight: 800, color: '#111827', margin: '6px 0 8px', lineHeight: 1.25 }}>
+                    {hero.title}
+                  </h2>
+                  {hero.summary && (
+                    <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.6, margin: 0 }} className="line-clamp-2">
+                      {hero.summary}
+                    </p>
                   )}
-                  <span className="inline-block mt-2 text-sm text-orange-600 font-medium">Vraag toevoegen →</span>
                 </div>
               </div>
             </Link>
-          ))}
+          )}
+
+          {/* Article list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {rest.map(article => (
+              <Link key={article.id} href={`/artikel/${article.id}`} style={{ textDecoration: 'none' }}>
+                <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', display: 'flex', gap: 14, alignItems: 'flex-start', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s' }}
+                  onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 3px 12px rgba(0,0,0,0.1)')}
+                  onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.05)')}>
+                  {article.image_url && (
+                    <img src={article.image_url} alt="" style={{ width: 80, height: 64, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }} />
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      {formatDate(article.published_at)}
+                    </span>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: '3px 0 0', lineHeight: 1.35 }} className="line-clamp-2">
+                      {article.title}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

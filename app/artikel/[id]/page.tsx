@@ -23,44 +23,45 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
 
   const { data: { user } } = await supabase.auth.getUser()
 
+  const fullDate = new Date(article.published_at).toLocaleDateString('nl-NL', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  })
+
   return (
-    <div className="max-w-2xl mx-auto">
-      <Link href="/" className="text-sm text-orange-600 hover:underline mb-4 inline-block">
-        ← Terug naar overzicht
+    <div style={{ maxWidth: 640, margin: '0 auto' }}>
+      <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#f97316', textDecoration: 'none', marginBottom: 20 }}>
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7"/>
+        </svg>
+        Terug naar overzicht
       </Link>
 
-      <article className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <article style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)', marginBottom: 24 }}>
         {article.image_url && (
-          <img
-            src={article.image_url}
-            alt=""
-            className="w-full h-56 object-cover"
-          />
+          <img src={article.image_url} alt="" style={{ width: '100%', height: 280, objectFit: 'cover' }} />
         )}
-        <div className="p-6">
-          <p className="text-xs text-orange-500 font-semibold mb-2">
-            {new Date(article.published_at).toLocaleDateString('nl-NL', {
-              weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-            })}
+        <div style={{ padding: '24px 28px 28px' }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 8px' }}>
+            {fullDate}
           </p>
-          <h1 className="text-2xl font-bold text-gray-900 mb-3 leading-snug">
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#111827', margin: '0 0 16px', lineHeight: 1.2 }}>
             {article.title}
           </h1>
 
           {article.summary && (
-            <p className="text-gray-600 text-base leading-relaxed mb-4 font-medium border-l-4 border-orange-300 pl-4">
+            <p style={{ fontSize: 15, fontWeight: 500, color: '#374151', lineHeight: 1.65, margin: '0 0 20px', paddingLeft: 16, borderLeft: '3px solid #fed7aa', background: '#fff7ed', padding: '12px 16px', borderRadius: '0 10px 10px 0' }}>
               {article.summary}
             </p>
           )}
 
           {article.content ? (
-            <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed space-y-3">
+            <div style={{ fontSize: 15, color: '#374151', lineHeight: 1.75 }}>
               {article.content.split('\n\n').map((para: string, i: number) => (
-                <p key={i}>{para}</p>
+                <p key={i} style={{ margin: i === 0 ? 0 : '14px 0 0' }}>{para}</p>
               ))}
             </div>
           ) : (
-            <p className="text-gray-400 text-sm italic">Volledige tekst wordt geladen bij de volgende scrape.</p>
+            <p style={{ fontSize: 14, color: '#9ca3af', fontStyle: 'italic' }}>Volledige tekst wordt geladen bij de volgende scrape.</p>
           )}
 
           {article.source_url && (
@@ -68,19 +69,27 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
               href={article.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block mt-5 text-sm text-orange-600 hover:underline"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 24, fontSize: 13, fontWeight: 600, color: '#f97316', textDecoration: 'none', padding: '8px 14px', background: '#fff7ed', borderRadius: 8, border: '1px solid #fed7aa' }}
             >
-              Bekijk op Jeugdjournaal →
+              Bekijk op Jeugdjournaal
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
             </a>
           )}
         </div>
       </article>
 
-      <div className="mt-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-3">
-          Welke vraag stelde jouw kind?
-        </h2>
-        <QuestionForm articleId={article.id} user={user} />
+      <div style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
+        <div style={{ padding: '20px 28px 0', borderBottom: '1px solid #f3f4f6' }}>
+          <h2 style={{ fontSize: 17, fontWeight: 800, color: '#111827', margin: '0 0 4px' }}>
+            💬 Welke vraag stelde jouw kind?
+          </h2>
+          <p style={{ fontSize: 13, color: '#9ca3af', margin: '0 0 18px' }}>Deel het gesprek dat jullie hadden aan tafel</p>
+        </div>
+        <div style={{ padding: 28 }}>
+          <QuestionForm articleId={article.id} user={user} />
+        </div>
       </div>
     </div>
   )
