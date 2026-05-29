@@ -10,53 +10,96 @@ function decodeHtml(str: string): string {
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
 }
 
-function isNavText(text: string): boolean {
-  return text.includes("Menu") || text.includes("Zoek in") || text.includes("Uitzendin") ||
-    text.includes("TikTok") || text.includes("Instagram") || text.includes("Gekopieerd") ||
-    text.includes("Kopieer link") || text.includes("YouTube")
+type ImagesByRatio = Record<string, Array<{ url: string; width: number; height: number }>>
+
+function bestImageUrl(imagesByRatio: ImagesByRatio): string | null {
+  // Prefer 16:9, fall back to 4:3, then any ratio
+  const ratio = imagesByRatio['16:9'] ?? imagesByRatio['4:3'] ?? Object.values(imagesByRatio)[0]
+  if (!ratio?.length) return null
+  // Pick ~768px wide — large enough but not massive
+  const sorted = [...ratio].sort((a, b) => a.width - b.width)
+  const preferred = sorted.find(img => img.width >= 640) ?? sorted[sorted.length - 1]
+  return preferred?.url ?? null
 }
 
-function extractContent(html: string): string {
-  // Grab article body
-  const bodyMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/) ||
-                    html.match(/<div[^>]*class="[^"]*article[^"]*"[^>]*>([\s\S]*?)<\/div>/)
-  const body = bodyMatch?.[1] || html
+type ContentBlock = {
+  type: string
+  id: string
+  content?: string | ContentBlock[] | Record<string, unknown>
+}
 
-  // Walk through body finding <p> and <img> tags in order
+function extractFromNextData(html: string): {
+  title: string
+  summary: string | null
+  image_url: string | null
+  content: string
+  published_at: string
+} | null {
+  const match = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/)
+  if (!match) return null
+
+  let data
+  try {
+    const json = JSON.parse(match[1])
+    data = json?.props?.pageProps?.data
+  } catch { return null }
+
+  if (!data) return null
+
+  const title = decodeHtml(data.title ?? '')
+  const summary = data.description ? decodeHtml(data.description) : null
+  const published_at = data.publishedAt ? new Date(data.publishedAt).toISOString() : new Date().toISOString()
+
+  // Hero image from headerImage or headerVideo thumbnail
+  let image_url: string | null = null
+  if (data.headerImage?.imagesByRatio) {
+    image_url = bestImageUrl(data.headerImage.imagesByRatio)
+  } else if (data.shareImageSrc) {
+    image_url = data.shareImageSrc
+  }
+
+  // Build content from structured blocks
   const parts: string[] = []
-  // Match both <p>...</p> and standalone <img ...>
-  const combined = body.matchAll(/(<img\b[^>]*>|<p[^>]*>([\s\S]*?)<\/p>)/g)
+  const blocks: ContentBlock[] = data.content ?? []
 
-  let paraCount = 0
-
-  for (const m of combined) {
-    const full = m[1]
-
-    if (full.startsWith('<img')) {
-      // Extract src attribute
-      const srcMatch = full.match(/\bsrc="([^"]+)"/)
-      if (srcMatch) {
-        const src = srcMatch[1]
-        // Skip tiny icons, data URLs, and svgs
-        if (!src.startsWith('data:') && !src.endsWith('.svg') && !src.includes('icon') && !src.includes('logo')) {
-          // Make absolute URL if needed
-          const url = src.startsWith('http') ? src : `${BASE_URL}${src}`
-          parts.push(`[IMG:${url}]`)
-        }
+  for (const block of blocks) {
+    switch (block.type) {
+      case 'text': {
+        const text = typeof block.content === 'string' ? block.content.trim() : ''
+        if (text.length > 10) parts.push(decodeHtml(text))
+        break
       }
-    } else {
-      // It's a <p> tag
-      const inner = m[2] ?? ''
-      const text = inner.replace(/<[^>]+>/g, '').trim()
-      if (text.length > 30 && !isNavText(text)) {
-        parts.push(decodeHtml(text))
-        paraCount++
-        if (paraCount >= 15) break
+      case 'title': {
+        const text = typeof block.content === 'string' ? block.content.trim() : ''
+        if (text.length > 3) parts.push(`**${decodeHtml(text)}**`)
+        break
       }
+      case 'quote': {
+        const inner = block.content as Record<string, unknown>
+        const text = typeof inner?.text === 'string' ? inner.text.trim() : ''
+        if (text.length > 10) parts.push(`"${decodeHtml(text)}"`)
+        break
+      }
+      case 'image': {
+        const inner = block.content as Record<string, unknown>
+        const ratios = inner?.imagesByRatio as ImagesByRatio
+        const url = ratios ? bestImageUrl(ratios) : null
+        if (url) parts.push(`[IMG:${url}]`)
+        break
+      }
+      case 'video': {
+        // Add video thumbnail if available
+        const inner = block.content as Record<string, unknown>
+        const ratios = inner?.imagesByRatio as ImagesByRatio
+        const url = ratios ? bestImageUrl(ratios) : null
+        if (url) parts.push(`[IMG:${url}]`)
+        break
+      }
+      // Skip linkContainer, poll, etc.
     }
   }
 
-  return parts.join('\n\n')
+  return { title, summary, image_url, content: parts.join('\n\n'), published_at }
 }
 
 export async function POST(req: NextRequest) {
@@ -95,22 +138,12 @@ export async function POST(req: NextRequest) {
         })
         const detailHtml = await detailRes.text()
 
-        const titleMatch = detailHtml.match(/<h1[^>]*>([^<]+)<\/h1>/) || detailHtml.match(/<title>([^<]+)<\/title>/)
-        const rawTitle = titleMatch?.[1]?.replace(' - NOS Jeugdjournaal', '').trim() || article.slug.replace(/-/g, ' ')
-        const title = decodeHtml(rawTitle)
-
-        const imgMatch = detailHtml.match(/og:image" content="([^"]+)"/)
-        const image_url = imgMatch?.[1] || null
-
-        const descMatch = detailHtml.match(/og:description" content="([^"]+)"/)
-        const summary = descMatch?.[1] ? decodeHtml(descMatch[1]) : null
-
-        const content = extractContent(detailHtml)
+        const extracted = extractFromNextData(detailHtml)
+        if (!extracted || !extracted.title) continue
 
         const { error } = await supabase.from('articles').upsert({
-          title, summary, content, image_url,
+          ...extracted,
           source_url: `${BASE_URL}${article.path}`,
-          published_at: new Date().toISOString(),
         }, { onConflict: 'source_url', ignoreDuplicates: false })
 
         if (!error) inserted++
