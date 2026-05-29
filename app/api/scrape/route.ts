@@ -21,7 +21,9 @@ function extractContent(html: string): string {
   const pMatches = body.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)
   for (const m of pMatches) {
     const text = m[1].replace(/<[^>]+>/g, '').trim()
-    if (text.length > 30) paragraphs.push(decodeHtml(text))
+    // Skip navigation/boilerplate paragraphs
+    const isNav = text.includes("Menu") || text.includes("Zoek in") || text.includes("Uitzendin") || text.includes("TikTok") || text.includes("Instagram") || text.includes("Gekopieerd")
+    if (text.length > 30 && !isNav) paragraphs.push(decodeHtml(text))
   }
   return paragraphs.slice(0, 15).join('\n\n')
 }
