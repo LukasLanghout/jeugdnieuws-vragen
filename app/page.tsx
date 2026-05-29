@@ -42,11 +42,9 @@ export default async function HomePage() {
           {/* Hero card */}
           {hero && (
             <Link href={`/artikel/${hero.id}`} style={{ textDecoration: 'none', display: 'block', marginBottom: 20 }}>
-              <div style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)', transition: 'box-shadow 0.2s' }}
-                onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.12)')}
-                onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)')}>
+              <div className="card-hover" style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
                 {hero.image_url && (
-                  <img src={hero.image_url} alt="" style={{ width: '100%', height: 240, objectFit: 'cover' }} />
+                  <img src={hero.image_url} alt="" style={{ width: '100%', height: 240, objectFit: 'cover', display: 'block' }} />
                 )}
                 <div style={{ padding: '18px 22px 22px' }}>
                   <span style={{ fontSize: 12, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -69,9 +67,7 @@ export default async function HomePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {rest.map(article => (
               <Link key={article.id} href={`/artikel/${article.id}`} style={{ textDecoration: 'none' }}>
-                <div style={{ background: 'white', borderRadius: 14, padding: '14px 16px', display: 'flex', gap: 14, alignItems: 'flex-start', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s' }}
-                  onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 3px 12px rgba(0,0,0,0.1)')}
-                  onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.05)')}>
+                <div className="card-hover" style={{ background: 'white', borderRadius: 14, padding: '14px 16px', display: 'flex', gap: 14, alignItems: 'flex-start', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                   {article.image_url && (
                     <img src={article.image_url} alt="" style={{ width: 80, height: 64, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }} />
                   )}

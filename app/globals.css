@@ -3,6 +3,7 @@
 
 * {
   font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
 }
 
 .line-clamp-2 {
@@ -17,4 +18,20 @@
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.card-hover {
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+.card-hover:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.13) !important;
+  transform: translateY(-1px);
+}
+
+.source-link:hover {
+  background: #ffedd5 !important;
+}
+
+.search-result-row:hover {
+  background: #fff7ed !important;
 }

@@ -38,7 +38,7 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
 
       <article style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)', marginBottom: 24 }}>
         {article.image_url && (
-          <img src={article.image_url} alt="" style={{ width: '100%', height: 280, objectFit: 'cover' }} />
+          <img src={article.image_url} alt="" style={{ width: '100%', height: 280, objectFit: 'cover', display: 'block' }} />
         )}
         <div style={{ padding: '24px 28px 28px' }}>
           <p style={{ fontSize: 12, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 8px' }}>
@@ -49,9 +49,9 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
           </h1>
 
           {article.summary && (
-            <p style={{ fontSize: 15, fontWeight: 500, color: '#374151', lineHeight: 1.65, margin: '0 0 20px', paddingLeft: 16, borderLeft: '3px solid #fed7aa', background: '#fff7ed', padding: '12px 16px', borderRadius: '0 10px 10px 0' }}>
+            <div style={{ fontSize: 15, fontWeight: 500, color: '#374151', lineHeight: 1.65, margin: '0 0 20px', padding: '12px 16px', background: '#fff7ed', borderLeft: '3px solid #fb923c', borderRadius: '0 10px 10px 0' }}>
               {article.summary}
-            </p>
+            </div>
           )}
 
           {article.content ? (
@@ -69,6 +69,7 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
               href={article.source_url}
               target="_blank"
               rel="noopener noreferrer"
+              className="source-link"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 24, fontSize: 13, fontWeight: 600, color: '#f97316', textDecoration: 'none', padding: '8px 14px', background: '#fff7ed', borderRadius: 8, border: '1px solid #fed7aa' }}
             >
               Bekijk op Jeugdjournaal
@@ -81,11 +82,11 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
       </article>
 
       <div style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
-        <div style={{ padding: '20px 28px 0', borderBottom: '1px solid #f3f4f6' }}>
-          <h2 style={{ fontSize: 17, fontWeight: 800, color: '#111827', margin: '0 0 4px' }}>
+        <div style={{ padding: '20px 28px 18px', borderBottom: '1px solid #f3f4f6' }}>
+          <h2 style={{ fontSize: 17, fontWeight: 800, color: '#111827', margin: 0 }}>
             💬 Welke vraag stelde jouw kind?
           </h2>
-          <p style={{ fontSize: 13, color: '#9ca3af', margin: '0 0 18px' }}>Deel het gesprek dat jullie hadden aan tafel</p>
+          <p style={{ fontSize: 13, color: '#9ca3af', margin: '4px 0 0' }}>Deel het gesprek dat jullie hadden aan tafel</p>
         </div>
         <div style={{ padding: 28 }}>
           <QuestionForm articleId={article.id} user={user} />
