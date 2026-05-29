@@ -10,22 +10,53 @@ function decodeHtml(str: string): string {
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
 }
 
+function isNavText(text: string): boolean {
+  return text.includes("Menu") || text.includes("Zoek in") || text.includes("Uitzendin") ||
+    text.includes("TikTok") || text.includes("Instagram") || text.includes("Gekopieerd") ||
+    text.includes("Kopieer link") || text.includes("YouTube")
+}
+
 function extractContent(html: string): string {
-  // Try to grab article paragraphs
+  // Grab article body
   const bodyMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/) ||
                     html.match(/<div[^>]*class="[^"]*article[^"]*"[^>]*>([\s\S]*?)<\/div>/)
   const body = bodyMatch?.[1] || html
 
-  // Extract all <p> tag content
-  const paragraphs: string[] = []
-  const pMatches = body.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)
-  for (const m of pMatches) {
-    const text = m[1].replace(/<[^>]+>/g, '').trim()
-    // Skip navigation/boilerplate paragraphs
-    const isNav = text.includes("Menu") || text.includes("Zoek in") || text.includes("Uitzendin") || text.includes("TikTok") || text.includes("Instagram") || text.includes("Gekopieerd")
-    if (text.length > 30 && !isNav) paragraphs.push(decodeHtml(text))
+  // Walk through body finding <p> and <img> tags in order
+  const parts: string[] = []
+  // Match both <p>...</p> and standalone <img ...>
+  const combined = body.matchAll(/(<img\b[^>]*>|<p[^>]*>([\s\S]*?)<\/p>)/g)
+
+  let paraCount = 0
+
+  for (const m of combined) {
+    const full = m[1]
+
+    if (full.startsWith('<img')) {
+      // Extract src attribute
+      const srcMatch = full.match(/\bsrc="([^"]+)"/)
+      if (srcMatch) {
+        const src = srcMatch[1]
+        // Skip tiny icons, data URLs, and svgs
+        if (!src.startsWith('data:') && !src.endsWith('.svg') && !src.includes('icon') && !src.includes('logo')) {
+          // Make absolute URL if needed
+          const url = src.startsWith('http') ? src : `${BASE_URL}${src}`
+          parts.push(`[IMG:${url}]`)
+        }
+      }
+    } else {
+      // It's a <p> tag
+      const inner = m[2] ?? ''
+      const text = inner.replace(/<[^>]+>/g, '').trim()
+      if (text.length > 30 && !isNavText(text)) {
+        parts.push(decodeHtml(text))
+        paraCount++
+        if (paraCount >= 15) break
+      }
+    }
   }
-  return paragraphs.slice(0, 15).join('\n\n')
+
+  return parts.join('\n\n')
 }
 
 export async function POST(req: NextRequest) {

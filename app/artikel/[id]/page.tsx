@@ -4,6 +4,26 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import QuestionForm from './QuestionForm'
 
+function renderContent(content: string) {
+  const parts = content.split('\n\n')
+  return parts.map((part, i) => {
+    const imgMatch = part.match(/^\[IMG:(.*)\]$/)
+    if (imgMatch) {
+      return (
+        <img
+          key={i}
+          src={imgMatch[1]}
+          alt=""
+          style={{ width: '100%', borderRadius: 12, margin: '8px 0', display: 'block' }}
+        />
+      )
+    }
+    return (
+      <p key={i} style={{ margin: i === 0 ? 0 : '14px 0 0' }}>{part}</p>
+    )
+  })
+}
+
 export default async function ArtikelPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const cookieStore = await cookies()
@@ -56,9 +76,7 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
 
           {article.content ? (
             <div style={{ fontSize: 15, color: '#374151', lineHeight: 1.75 }}>
-              {article.content.split('\n\n').map((para: string, i: number) => (
-                <p key={i} style={{ margin: i === 0 ? 0 : '14px 0 0' }}>{para}</p>
-              ))}
+              {renderContent(article.content)}
             </div>
           ) : (
             <p style={{ fontSize: 14, color: '#9ca3af', fontStyle: 'italic' }}>Volledige tekst wordt geladen bij de volgende scrape.</p>
