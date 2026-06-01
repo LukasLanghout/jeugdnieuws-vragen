@@ -50,7 +50,9 @@ export default function ChatWindow({ linkId, userId, isParent, childName, initia
           .select('*, articles(id, title, image_url)')
           .eq('id', payload.new.id)
           .single()
-        if (data) setMessages(prev => [...prev, data as Message])
+        if (data) setMessages(prev =>
+          prev.some(m => m.id === data.id) ? prev : [...prev, data as Message]
+        )
       })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
@@ -59,14 +61,29 @@ export default function ChatWindow({ linkId, userId, isParent, childName, initia
   async function handleSend() {
     if (!body.trim()) return
     setSending(true)
-    await supabase.from('messages').insert({
-      family_link_id: linkId,
+    const optimisticMsg: Message = {
+      id: `optimistic-${Date.now()}`,
       sender_id: userId,
       body: body.trim(),
+      created_at: new Date().toISOString(),
       article_id: selectedArticle?.id ?? null,
-    })
+      articles: selectedArticle ?? null,
+    }
+    setMessages(prev => [...prev, optimisticMsg])
+    const textToSend = body.trim()
+    const articleToSend = selectedArticle
     setBody('')
     setSelectedArticle(null)
+    const { data } = await supabase.from('messages').insert({
+      family_link_id: linkId,
+      sender_id: userId,
+      body: textToSend,
+      article_id: articleToSend?.id ?? null,
+    }).select('id').single()
+    // Replace optimistic message with real id
+    if (data) {
+      setMessages(prev => prev.map(m => m.id === optimisticMsg.id ? { ...m, id: data.id } : m))
+    }
     setSending(false)
   }
 
