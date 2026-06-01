@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { Article } from '@/lib/supabase'
 import SearchBar from './SearchBar'
+import RefreshButton from './RefreshButton'
 
 async function getArticles(): Promise<Article[]> {
   const cookieStore = await cookies()
@@ -29,6 +30,11 @@ export default async function HomePage() {
 
   return (
     <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <h2 style={{ fontSize: 17, fontWeight: 800, color: '#111827', margin: 0 }}>Laatste nieuws</h2>
+        <RefreshButton />
+      </div>
+
       <SearchBar />
 
       {articles.length === 0 ? (
