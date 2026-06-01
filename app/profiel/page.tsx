@@ -1,9 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import LogoutButton from './LogoutButton'
 import DiaryEntry from './DiaryEntry'
+import ArticlePicker from './ArticlePicker'
 
 export default async function ProfielPage() {
   const cookieStore = await cookies()
@@ -16,12 +16,13 @@ export default async function ProfielPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Fetch diary entries with article info
   const { data: entries } = await supabase
     .from('diary_entries')
     .select('*, articles(id, title, image_url, published_at, source_url)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
+
+  const existingArticleIds = (entries ?? []).map((e: Record<string, unknown>) => e.article_id as string)
 
   return (
     <div style={{ maxWidth: 640, margin: '0 auto' }}>
@@ -44,19 +45,14 @@ export default async function ProfielPage() {
       {/* Diary section */}
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h2 style={{ fontSize: 18, fontWeight: 800, color: '#111827', margin: 0 }}>📖 Ons dagboek</h2>
-        <Link href="/" style={{ fontSize: 13, fontWeight: 600, color: '#f97316', textDecoration: 'none', padding: '6px 14px', background: '#fff7ed', border: '1.5px solid #fed7aa', borderRadius: 8 }}>
-          + Nieuw artikel koppelen
-        </Link>
+        <ArticlePicker userId={user.id} existingArticleIds={existingArticleIds} />
       </div>
 
       {!entries || entries.length === 0 ? (
         <div style={{ background: 'white', borderRadius: 20, padding: '48px 32px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>📖</div>
           <p style={{ fontWeight: 700, color: '#111827', fontSize: 16, margin: '0 0 8px' }}>Nog geen dagboek entries</p>
-          <p style={{ fontSize: 14, color: '#9ca3af', margin: '0 0 20px' }}>Open een artikel en klik op "Toevoegen aan dagboek" om te beginnen.</p>
-          <Link href="/" style={{ display: 'inline-block', background: '#f97316', color: 'white', padding: '10px 24px', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-            Bekijk artikelen
-          </Link>
+          <p style={{ fontSize: 14, color: '#9ca3af', margin: 0 }}>Klik op "Nieuw artikel koppelen" om te beginnen, of open een artikel en klik op "Toevoegen aan dagboek".</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
