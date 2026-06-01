@@ -20,41 +20,84 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="nl">
-      <body style={{ background: '#f8f7f4', minHeight: '100vh' }}>
-        <header style={{ background: 'white', borderBottom: '1px solid #e8e4de', position: 'sticky', top: 0, zIndex: 100 }}>
-          <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 20px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-              <div style={{ width: 34, height: 34, background: 'linear-gradient(135deg, #f97316, #fb923c)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
-                🗞️
-              </div>
+      <body>
+        <header style={{
+          background: 'white',
+          borderBottom: '2px solid #ede8e0',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+        }}>
+          <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
+              <div style={{
+                width: 40, height: 40,
+                background: '#f97316',
+                borderRadius: 14,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 20,
+                boxShadow: '0 3px 0 0 rgba(0,0,0,0.18)',
+                flexShrink: 0,
+              }}>🗞️</div>
               <div>
-                <div style={{ fontWeight: 800, fontSize: 16, color: '#1a1a1a', lineHeight: 1.1 }}>Tafelvragen</div>
-                <div style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500 }}>Jeugdjournaal voor thuis</div>
+                <div style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 700, fontSize: 20, color: '#1a1209', lineHeight: 1, letterSpacing: '-0.3px' }}>
+                  Tafelvragen
+                </div>
+                <div style={{ fontSize: 10.5, color: '#9c8b78', fontWeight: 500, marginTop: 2, letterSpacing: '0.03em' }}>
+                  JEUGDJOURNAAL VOOR THUIS
+                </div>
               </div>
             </Link>
 
             {user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Link
-                  href="/profiel"
-                  style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', padding: '6px 12px', background: '#fff7ed', border: '1.5px solid #fed7aa', borderRadius: 10, transition: 'background 0.15s' }}
-                >
-                  <div style={{ width: 26, height: 26, background: 'linear-gradient(135deg, #f97316, #fb923c)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: 'white', fontWeight: 700, flexShrink: 0 }}>
-                    {user.email?.[0]?.toUpperCase() ?? '?'}
-                  </div>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#c2410c' }}>Mijn dagboek</span>
-                </Link>
-              </div>
+              <Link href="/profiel" style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                textDecoration: 'none',
+                padding: '7px 14px',
+                background: '#f97316',
+                borderRadius: 12,
+                boxShadow: '0 3px 0 0 rgba(0,0,0,0.18)',
+                transition: 'transform 0.1s, box-shadow 0.1s',
+              }}>
+                <div style={{
+                  width: 24, height: 24,
+                  background: 'rgba(255,255,255,0.25)',
+                  borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 12, color: 'white', fontWeight: 800,
+                }}>
+                  {user.email?.[0]?.toUpperCase() ?? '?'}
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>Mijn dagboek</span>
+              </Link>
             ) : (
-              <Link href="/login" style={{ fontSize: 13, fontWeight: 600, color: '#f97316', textDecoration: 'none', padding: '7px 16px', background: '#fff7ed', border: '1.5px solid #fed7aa', borderRadius: 10 }}>
+              <Link href="/login" style={{
+                fontSize: 13, fontWeight: 700, color: '#f97316',
+                textDecoration: 'none',
+                padding: '7px 16px',
+                background: 'white',
+                border: '2px solid #f97316',
+                borderRadius: 12,
+                boxShadow: '0 3px 0 0 #fed7aa',
+              }}>
                 Inloggen
               </Link>
             )}
           </div>
         </header>
-        <main style={{ maxWidth: 720, margin: '0 auto', padding: '28px 20px 60px' }}>
+
+        <main style={{ maxWidth: 760, margin: '0 auto', padding: '32px 20px 80px' }}>
           {children}
         </main>
+
+        <footer style={{ borderTop: '2px solid #ede8e0', background: 'white', padding: '20px', textAlign: 'center' }}>
+          <p style={{ fontSize: 12, color: '#b0a090', margin: 0 }}>
+            Tafelvragen · Nieuws van{' '}
+            <a href="https://jeugdjournaal.nl" target="_blank" style={{ color: '#f97316', textDecoration: 'none', fontWeight: 600 }}>
+              Jeugdjournaal.nl
+            </a>
+          </p>
+        </footer>
       </body>
     </html>
   );
