@@ -3,24 +3,26 @@ import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import QuestionForm from './QuestionForm'
+import AddToDiary from './AddToDiary'
 
 function renderContent(content: string) {
   const parts = content.split('\n\n')
   return parts.map((part, i) => {
     const imgMatch = part.match(/^\[IMG:(.*)\]$/)
     if (imgMatch) {
+      return <img key={i} src={imgMatch[1]} alt="" style={{ width: '100%', borderRadius: 12, margin: '8px 0', display: 'block' }} />
+    }
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <p key={i} style={{ fontWeight: 700, color: '#111827', margin: i === 0 ? 0 : '18px 0 0', fontSize: 15 }}>{part.slice(2, -2)}</p>
+    }
+    if (part.startsWith('"') && part.endsWith('"')) {
       return (
-        <img
-          key={i}
-          src={imgMatch[1]}
-          alt=""
-          style={{ width: '100%', borderRadius: 12, margin: '8px 0', display: 'block' }}
-        />
+        <blockquote key={i} style={{ margin: i === 0 ? 0 : '14px 0 0', padding: '10px 16px', background: '#f9fafb', borderLeft: '3px solid #d1d5db', borderRadius: '0 8px 8px 0', fontStyle: 'italic', color: '#6b7280', fontSize: 14 }}>
+          {part}
+        </blockquote>
       )
     }
-    return (
-      <p key={i} style={{ margin: i === 0 ? 0 : '14px 0 0' }}>{part}</p>
-    )
+    return <p key={i} style={{ margin: i === 0 ? 0 : '14px 0 0' }}>{part}</p>
   })
 }
 
@@ -33,15 +35,22 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
     { cookies: { getAll: () => cookieStore.getAll() } }
   )
 
-  const { data: article } = await supabase
-    .from('articles')
-    .select('*')
-    .eq('id', id)
-    .single()
-
+  const { data: article } = await supabase.from('articles').select('*').eq('id', id).single()
   if (!article) notFound()
 
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Check if already in diary
+  let alreadyAdded = false
+  if (user) {
+    const { data: existing } = await supabase
+      .from('diary_entries')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('article_id', id)
+      .single()
+    alreadyAdded = !!existing
+  }
 
   const fullDate = new Date(article.published_at).toLocaleDateString('nl-NL', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
@@ -82,28 +91,24 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
             <p style={{ fontSize: 14, color: '#9ca3af', fontStyle: 'italic' }}>Volledige tekst wordt geladen bij de volgende scrape.</p>
           )}
 
-          {article.source_url && (
-            <a
-              href={article.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="source-link"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 24, fontSize: 13, fontWeight: 600, color: '#f97316', textDecoration: 'none', padding: '8px 14px', background: '#fff7ed', borderRadius: 8, border: '1px solid #fed7aa' }}
-            >
-              Bekijk op Jeugdjournaal
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-              </svg>
-            </a>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 24, flexWrap: 'wrap' }}>
+            {article.source_url && (
+              <a href={article.source_url} target="_blank" rel="noopener noreferrer" className="source-link"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#f97316', textDecoration: 'none', padding: '8px 14px', background: '#fff7ed', borderRadius: 8, border: '1px solid #fed7aa' }}>
+                Bekijk op Jeugdjournaal
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+              </a>
+            )}
+            <AddToDiary articleId={article.id} user={user} alreadyAdded={alreadyAdded} />
+          </div>
         </div>
       </article>
 
       <div style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
         <div style={{ padding: '20px 28px 18px', borderBottom: '1px solid #f3f4f6' }}>
-          <h2 style={{ fontSize: 17, fontWeight: 800, color: '#111827', margin: 0 }}>
-            💬 Welke vraag stelde jouw kind?
-          </h2>
+          <h2 style={{ fontSize: 17, fontWeight: 800, color: '#111827', margin: 0 }}>💬 Welke vraag stelde jouw kind?</h2>
           <p style={{ fontSize: 13, color: '#9ca3af', margin: '4px 0 0' }}>Deel het gesprek dat jullie hadden aan tafel</p>
         </div>
         <div style={{ padding: 28 }}>
