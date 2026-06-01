@@ -85,7 +85,7 @@ export default function AcceptInvite({ linkId, childName, user, inviteCode }: {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <input type="email" placeholder="E-mailadres" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} onFocus={e => e.currentTarget.style.borderColor='#f97316'} onBlur={e => e.currentTarget.style.borderColor='#e5e7eb'} />
         <input type="password" placeholder="Wachtwoord" value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} onFocus={e => e.currentTarget.style.borderColor='#f97316'} onBlur={e => e.currentTarget.style.borderColor='#e5e7eb'} />
-        <button onClick={() => handleAuth(mode)} disabled={loading || !email || !password}
+        <button onClick={() => handleAuth(mode === 'accept' ? 'login' : mode)} disabled={loading || !email || !password}
           style={{ background: email && password ? '#f97316' : '#e5e7eb', color: email && password ? 'white' : '#9ca3af', border: 'none', borderRadius: 10, padding: '12px 0', fontWeight: 700, fontSize: 14, cursor: email && password ? 'pointer' : 'not-allowed', fontFamily: 'inherit' }}>
           {loading ? 'Laden...' : mode === 'login' ? 'Inloggen & koppelen' : 'Aanmelden & koppelen'}
         </button>
