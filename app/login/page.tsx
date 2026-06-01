@@ -57,6 +57,23 @@ export default function LoginPage() {
     }
   }
 
+
+  async function handleSamLogin() {
+    setLoading(true)
+    setError('')
+    const { error } = await supabase.auth.signInWithPassword({
+      email: 'demo.kind@tafelvragen.nl',
+      password: 'demo1234',
+    })
+    if (error) {
+      setError('Demo login mislukt, probeer het opnieuw.')
+      setLoading(false)
+    } else {
+      router.push('/profiel')
+      router.refresh()
+    }
+  }
+
   const inputStyle = {
     width: '100%',
     border: '1.5px solid #e5e7eb',
@@ -172,13 +189,22 @@ export default function LoginPage() {
             <span style={{ fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap' }}>of probeer de demo</span>
             <div style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
           </div>
-          <button
-            onClick={handleDemoLogin}
-            disabled={loading}
-            style={{ width: '100%', background: '#fff7ed', color: '#f97316', border: '1.5px solid #fed7aa', borderRadius: 10, padding: '12px 0', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}
-          >
-            Demo gezin bekijken
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={handleDemoLogin}
+              disabled={loading}
+              style={{ flex: 1, background: '#fff7ed', color: '#f97316', border: '1.5px solid #fed7aa', borderRadius: 10, padding: '11px 0', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              Demo ouder
+            </button>
+            <button
+              onClick={handleSamLogin}
+              disabled={loading}
+              style={{ flex: 1, background: '#f0fdf4', color: '#16a34a', border: '1.5px solid #bbf7d0', borderRadius: 10, padding: '11px 0', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              Demo kind (Sam)
+            </button>
+          </div>
         </div>
       </div>
     </div>
