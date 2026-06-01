@@ -1,18 +1,14 @@
 'use client'
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
+import { deleteFamily } from './actions'
 
 export default function DeleteFamily({ familyId }: { familyId: string }) {
   const [confirm, setConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
-  const supabase = createClient()
 
   async function handleDelete() {
     setLoading(true)
-    await supabase.from('family_links').delete().eq('id', familyId)
-    router.refresh()
+    await deleteFamily(familyId)
   }
 
   if (confirm) {
@@ -27,6 +23,7 @@ export default function DeleteFamily({ familyId }: { familyId: string }) {
         </button>
         <button
           onClick={() => setConfirm(false)}
+          disabled={loading}
           style={{ fontSize: 11, fontWeight: 700, color: '#7c6f5e', background: '#f3ede6', border: 'none', borderRadius: 7, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit' }}
         >
           Annuleer
