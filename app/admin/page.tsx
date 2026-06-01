@@ -119,7 +119,7 @@ export default async function AdminPage() {
     created_at: string
     articles: { id: string; title: string; image_url: string | null; published_at: string } | null
   }
-  const questions = (diaryEntries as DiaryEntry[] ?? [])
+  const questions = (diaryEntries as unknown as DiaryEntry[] ?? [])
     .filter(e => e.child_question && e.child_question.trim())
     .map(e => ({
       id: e.id,
@@ -141,7 +141,7 @@ export default async function AdminPage() {
 
   // Per article stats
   type Article = { id: string; title: string; image_url: string | null; published_at: string }
-  const articleStats = (articles as Article[] ?? []).map(a => {
+  const articleStats = (articles as unknown as Article[] ?? []).map(a => {
     const entries = (diaryEntries as DiaryEntry[] ?? []).filter(e => e.article_id === a.id)
     const qs = entries.filter(e => e.child_question?.trim())
     return {
