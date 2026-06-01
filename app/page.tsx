@@ -51,13 +51,17 @@ export default async function HomePage() {
 
       {articles.length === 0 ? (
         <div style={{ background: 'white', borderRadius: 20, padding: 48, textAlign: 'center', border: '2px solid #ede8e0', boxShadow: '0 4px 0 0 #ede8e0' }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>📺</div>
-          <p style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 700, fontSize: 20, color: '#1a1209' }}>Nog geen nieuwsberichten</p>
-          <p style={{ fontSize: 14, color: '#9c8b78', marginTop: 6 }}>Klik op de ververs-knop om artikelen te laden</p>
+          <div style={{ width: 56, height: 56, background: '#f3ede6', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b0a090" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/>
+            </svg>
+          </div>
+          <p style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 700, fontSize: 18, color: '#1a1209', margin: '0 0 6px' }}>Nog geen nieuwsberichten</p>
+          <p style={{ fontSize: 14, color: '#9c8b78', margin: 0 }}>Klik op de ververs-knop om artikelen te laden</p>
         </div>
       ) : (
         <div>
-          {/* Hero card — full editorial */}
+          {/* Hero card */}
           {hero && (
             <Link href={`/artikel/${hero.id}`} style={{ textDecoration: 'none', display: 'block', marginBottom: 16 }}>
               <div className="card-hover" style={{
@@ -72,7 +76,7 @@ export default async function HomePage() {
                     <img src={hero.image_url} alt="" style={{ width: '100%', height: 260, objectFit: 'cover', display: 'block' }} />
                     <div style={{
                       position: 'absolute', bottom: 0, left: 0, right: 0,
-                      background: 'linear-gradient(transparent, rgba(20,12,4,0.55))',
+                      background: 'linear-gradient(transparent, rgba(20,12,4,0.5))',
                       height: 100,
                     }} />
                     <span style={{
@@ -83,7 +87,7 @@ export default async function HomePage() {
                       padding: '4px 10px',
                       borderRadius: 999,
                       textTransform: 'uppercase',
-                      letterSpacing: '0.07em',
+                      letterSpacing: '0.08em',
                       boxShadow: '0 2px 0 0 rgba(0,0,0,0.2)',
                     }}>
                       Nieuwste
@@ -105,20 +109,22 @@ export default async function HomePage() {
                     {hero.title}
                   </h2>
                   {hero.summary && (
-                    <p style={{ fontSize: 14.5, color: '#7c6f5e', lineHeight: 1.65, margin: 0 }} className="line-clamp-2">
+                    <p style={{ fontSize: 14.5, color: '#7c6f5e', lineHeight: 1.65, margin: '0 0 16px' }} className="line-clamp-2">
                       {hero.summary}
                     </p>
                   )}
-                  <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#f97316' }}>Lees verder</span>
-                    <span style={{ color: '#f97316', fontSize: 16, lineHeight: 1 }}>→</span>
-                  </div>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#f97316', display: 'flex', alignItems: 'center', gap: 5 }}>
+                    Lees verder
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </span>
                 </div>
               </div>
             </Link>
           )}
 
-          {/* Second article — horizontal featured */}
+          {/* Second article */}
           {second && (
             <Link href={`/artikel/${second.id}`} style={{ textDecoration: 'none', display: 'block', marginBottom: 16 }}>
               <div className="card-hover-sm" style={{
@@ -165,7 +171,7 @@ export default async function HomePage() {
 
           {/* Rest — compact list */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {rest.map((article, i) => (
+            {rest.map((article) => (
               <Link key={article.id} href={`/artikel/${article.id}`} style={{ textDecoration: 'none' }}>
                 <div className="card-hover-sm" style={{
                   background: 'white',
@@ -177,23 +183,20 @@ export default async function HomePage() {
                   border: '1.5px solid #ede8e0',
                   boxShadow: '0 2px 0 0 rgba(0,0,0,0.05)',
                 }}>
-                  <div style={{
-                    width: 32, height: 32, borderRadius: 10,
-                    background: i % 3 === 0 ? '#fff7ed' : i % 3 === 1 ? '#f0fdf4' : '#faf5ff',
-                    border: `1.5px solid ${i % 3 === 0 ? '#fed7aa' : i % 3 === 1 ? '#bbf7d0' : '#e9d5ff'}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 15, flexShrink: 0,
-                  }}>
-                    {['📰','🌍','🎓','🏆','🎨','🔬','🎵','💡'][i % 8]}
-                  </div>
-                  {article.image_url && (
+                  {article.image_url ? (
                     <img src={article.image_url} alt="" style={{ width: 72, height: 56, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }} />
+                  ) : (
+                    <div style={{ width: 72, height: 56, background: '#f3ede6', borderRadius: 10, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c4b09a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+                      </svg>
+                    </div>
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{
                       fontFamily: "'Newsreader', Georgia, serif",
                       fontSize: 14.5, fontWeight: 600,
-                      color: '#1a1209', margin: '0 0 3px',
+                      color: '#1a1209', margin: '0 0 4px',
                       lineHeight: 1.3,
                     }} className="line-clamp-2">
                       {article.title}
@@ -202,7 +205,9 @@ export default async function HomePage() {
                       {formatDateShort(article.published_at)}
                     </span>
                   </div>
-                  <span style={{ color: '#d4c4a8', fontSize: 16, flexShrink: 0 }}>›</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4c4a8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M9 18l6-6-6-6"/>
+                  </svg>
                 </div>
               </Link>
             ))}

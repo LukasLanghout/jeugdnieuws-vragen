@@ -177,7 +177,7 @@ export default function LoginPage() {
             disabled={loading}
             style={{ width: '100%', background: '#fff7ed', color: '#f97316', border: '1.5px solid #fed7aa', borderRadius: 10, padding: '12px 0', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}
           >
-            🏠 Demo gezin bekijken
+            Demo gezin bekijken
           </button>
         </div>
       </div>

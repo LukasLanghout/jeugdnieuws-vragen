@@ -33,18 +33,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <div style={{
                 width: 40, height: 40,
                 background: '#f97316',
-                borderRadius: 14,
+                borderRadius: 12,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 20,
                 boxShadow: '0 3px 0 0 rgba(0,0,0,0.18)',
                 flexShrink: 0,
-              }}>🗞️</div>
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/>
+                  <path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/>
+                </svg>
+              </div>
               <div>
                 <div style={{ fontFamily: "'Newsreader', Georgia, serif", fontWeight: 700, fontSize: 20, color: '#1a1209', lineHeight: 1, letterSpacing: '-0.3px' }}>
                   Tafelvragen
                 </div>
-                <div style={{ fontSize: 10.5, color: '#9c8b78', fontWeight: 500, marginTop: 2, letterSpacing: '0.03em' }}>
-                  JEUGDJOURNAAL VOOR THUIS
+                <div style={{ fontSize: 10, color: '#9c8b78', fontWeight: 600, marginTop: 2, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  Jeugdjournaal voor thuis
                 </div>
               </div>
             </Link>
@@ -57,7 +61,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 background: '#f97316',
                 borderRadius: 12,
                 boxShadow: '0 3px 0 0 rgba(0,0,0,0.18)',
-                transition: 'transform 0.1s, box-shadow 0.1s',
               }}>
                 <div style={{
                   width: 24, height: 24,
@@ -92,7 +95,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         <footer style={{ borderTop: '2px solid #ede8e0', background: 'white', padding: '20px', textAlign: 'center' }}>
           <p style={{ fontSize: 12, color: '#b0a090', margin: 0 }}>
-            Tafelvragen · Nieuws van{' '}
+            Tafelvragen — nieuws van{' '}
             <a href="https://jeugdjournaal.nl" target="_blank" style={{ color: '#f97316', textDecoration: 'none', fontWeight: 600 }}>
               Jeugdjournaal.nl
             </a>

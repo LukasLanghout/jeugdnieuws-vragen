@@ -183,7 +183,7 @@ export default async function ArtikelPage({ params }: { params: Promise<{ id: st
             fontSize: 18, fontWeight: 700,
             color: '#1a1209', margin: 0,
           }}>
-            💬 Welke vraag stelde jouw kind?
+            Welke vraag stelde jouw kind?
           </h2>
           <p style={{ fontSize: 13, color: '#9c8b78', margin: '4px 0 0' }}>
             Deel het gesprek dat jullie hadden aan tafel
