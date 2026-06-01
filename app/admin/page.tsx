@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabaseAdmin'
 import Link from 'next/link'
 
-const ADMIN_EMAIL = 'ljlanghout@gmail.com'
+const ADMIN_EMAIL = 'admin@tafelvragen.nl'
 
 const CATEGORIES: { label: string; keywords: string[] }[] = [
   { label: 'Natuur & Wetenschap', keywords: ['natuur','wetenschap','ruimte','planeet','dier','plant','klimaat','water','lucht','energie','onderzoek','ontdekking','vliegen','vliegt','robot'] },
