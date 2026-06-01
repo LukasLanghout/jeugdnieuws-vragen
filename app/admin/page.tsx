@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabaseAdmin'
 import Link from 'next/link'
+import DeleteFamily from './DeleteFamily'
 
 const ADMIN_EMAIL = 'admin@tafelvragen.nl'
 
@@ -194,7 +195,7 @@ export default async function AdminPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ background: '#fdf8f3', borderBottom: '1.5px solid #ede8e0' }}>
-                {['Ouder', 'Kind', 'Gekoppeld', 'Entries', 'Berichten', 'Status'].map(h => (
+                {['Ouder', 'Kind', 'Gekoppeld', 'Entries', 'Berichten', 'Status', ''].map(h => (
                   <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontWeight: 700, color: '#7c6f5e', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
@@ -215,6 +216,9 @@ export default async function AdminPage() {
                     <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: f.accepted_at ? '#f0fdf4' : '#f3ede6', color: f.accepted_at ? '#15803d' : '#9c8b78', border: `1.5px solid ${f.accepted_at ? '#bbf7d0' : '#ede8e0'}` }}>
                       {f.accepted_at ? 'Actief' : 'Uitnodiging'}
                     </span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <DeleteFamily familyId={f.id} />
                   </td>
                 </tr>
               ))}
