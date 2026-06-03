@@ -28,7 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           top: 0,
           zIndex: 100,
         }}>
-          <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', height: 64, display: 'flex', alignItems: 'center', gap: 16 }}>
             <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
               <div style={{
                 width: 40, height: 40,
@@ -52,6 +52,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </div>
               </div>
             </Link>
+
+            <nav style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+              <Link href="/gesprek" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, color: '#c2410c', textDecoration: 'none', padding: '7px 13px', background: '#fff7ed', border: '1.5px solid #fed7aa', borderRadius: 11, boxShadow: '0 2px 0 0 #fed7aa', whiteSpace: 'nowrap' }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                </svg>
+                Gesprek bij het avondeten
+              </Link>
+            </nav>
 
             {user ? (
               <Link href="/profiel" style={{
